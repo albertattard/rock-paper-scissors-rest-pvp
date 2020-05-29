@@ -1,4 +1,4 @@
-package demo.games;
+package demo.games.pvc;
 
 public enum Outcome {
   PLAYER_WIN,

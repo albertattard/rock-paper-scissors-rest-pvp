@@ -1,4 +1,4 @@
-package demo.games;
+package demo.games.pvp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

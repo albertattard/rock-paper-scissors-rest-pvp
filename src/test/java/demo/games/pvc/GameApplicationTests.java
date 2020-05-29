@@ -1,5 +1,6 @@
-package demo.games;
+package demo.games.pvc;
 
+import demo.games.shared.Hand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,21 @@ public class GameApplicationTests {
     );
 
     final String url = String.format( "http://localhost:%d/play/%s", port, player.name() );
+    assertThat( this.restTemplate.getForObject( url, PlayResult.class ) )
+      .isIn( outcomes );
+  }
+
+  @Test
+  @DisplayName( "should play against another player" )
+  public void shouldPlayAgainstAnotherPlayer() {
+    final Hand player1 = Hand.ROCK;
+    final var outcomes = List.of(
+      new PlayResult( Hand.ROCK, player1, Outcome.DRAW ),
+      new PlayResult( Hand.PAPER, player1, Outcome.COMPUTER_WIN ),
+      new PlayResult( Hand.SCISSORS, player1, Outcome.PLAYER_WIN )
+    );
+
+    final String url = String.format( "http://localhost:%d/play/%s", port, player1.name() );
     assertThat( this.restTemplate.getForObject( url, PlayResult.class ) )
       .isIn( outcomes );
   }

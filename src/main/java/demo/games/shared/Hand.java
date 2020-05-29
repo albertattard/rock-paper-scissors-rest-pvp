@@ -1,4 +1,4 @@
-package demo.games;
+package demo.games.shared;
 
 public enum Hand {
   ROCK,

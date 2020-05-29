@@ -1,25 +1,25 @@
-package demo.games;
+package demo.games.pvc;
 
+import demo.games.shared.Hand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import static demo.games.Outcome.COMPUTER_WIN;
-import static demo.games.Outcome.DRAW;
-import static demo.games.Outcome.PLAYER_WIN;
+import static demo.games.pvc.Outcome.COMPUTER_WIN;
+import static demo.games.pvc.Outcome.DRAW;
+import static demo.games.pvc.Outcome.PLAYER_WIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName( "Game service basic and PVC" )
-public class BasicPvcGameServiceTest {
+public class PvpGameServiceTest {
 
   private static final int NUMBER_OF_HANDS = Hand.values().length;
 
@@ -29,13 +29,12 @@ public class BasicPvcGameServiceTest {
     final Hand expectedHand = Hand.ROCK;
 
     final RandomService randomService = mockRandomService( expectedHand );
-    final GameRepository repository = mockRepository();
 
-    final GameService service = new GameService( randomService, repository );
+    final PvcGameService service = new PvcGameService( randomService );
     final Hand hand = service.random();
     assertSame( expectedHand, hand );
 
-    verifyMocks( randomService, repository );
+    verifyMocks( randomService );
   }
 
   @EnumSource( Hand.class )
@@ -58,14 +57,13 @@ public class BasicPvcGameServiceTest {
 
   private void playAndAssert( Hand computer, Hand player, Outcome outcome ) {
     final RandomService randomService = mockRandomService( computer );
-    final GameRepository repository = mockRepository();
 
-    final GameService service = new GameService( randomService, repository );
+    final PvcGameService service = new PvcGameService( randomService );
 
     final PlayResult result = new PlayResult( computer, player, outcome );
     assertEquals( result, service.play( player ) );
 
-    verifyMocks( randomService, repository );
+    verifyMocks( randomService );
   }
 
   private RandomService mockRandomService( final Hand computer ) {
@@ -74,12 +72,7 @@ public class BasicPvcGameServiceTest {
     return randomService;
   }
 
-  private GameRepository mockRepository() {
-    return mock( GameRepository.class );
-  }
-
-  private void verifyMocks( final RandomService randomService, GameRepository repository ) {
+  private void verifyMocks( final RandomService randomService ) {
     verify( randomService, times( 1 ) ).nextInt( NUMBER_OF_HANDS );
-    verifyNoInteractions( repository );
   }
 }

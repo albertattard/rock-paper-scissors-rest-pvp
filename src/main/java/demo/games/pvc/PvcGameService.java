@@ -1,16 +1,15 @@
-package demo.games;
+package demo.games.pvc;
 
+import demo.games.shared.Hand;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GameService {
+public class PvcGameService {
 
   private final RandomService randomService;
-  private final GameRepository repository;
 
-  public GameService( final RandomService randomService, final GameRepository repository ) {
+  public PvcGameService( final RandomService randomService ) {
     this.randomService = randomService;
-    this.repository = repository;
   }
 
   public PlayResult play( final Hand player ) {
@@ -28,16 +27,5 @@ public class GameService {
   public Hand random() {
     final Hand[] candidates = Hand.values();
     return candidates[randomService.nextInt( candidates.length )];
-  }
-
-  public GameResponse create( final Hand player1 ) {
-    final String code = randomService.nextCode( 8 );
-
-    final Game game = new Game();
-    game.setCode( code );
-    game.setPlayer1( player1 );
-    repository.save( game );
-
-    return new GameResponse( code );
   }
 }

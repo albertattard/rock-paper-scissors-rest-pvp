@@ -1,5 +1,6 @@
-package demo.games;
+package demo.games.pvc;
 
+import demo.games.shared.Hand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +17,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /* Just load the following controller and all it needs */
-@WebMvcTest( GameController.class )
+@WebMvcTest( PvcGameController.class )
 @DisplayName( "Rock controller" )
-public class GameControllerTest {
+public class PvcGameControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
 
   @MockBean
-  private GameService service;
+  private PvcGameService service;
 
   @Test
   @DisplayName( "should return the hand provided by the service" )
@@ -53,21 +54,5 @@ public class GameControllerTest {
       .andExpect( jsonPath( "$.outcome", is( result.getOutcome().name() ) ) );
 
     verify( service, times( 1 ) ).play( result.getPlayer() );
-  }
-
-  @Test
-  @DisplayName( "should create the new game and return the code" )
-  public void shouldCreateGameAndReturnCode() throws Exception {
-
-    final Hand player1 = Hand.ROCK;
-    final String code = "abcdefgh";
-
-    when( service.create( player1 ) ).thenReturn( new GameResponse( code ) );
-
-    mockMvc.perform( get( String.format( "/game/new/%s", player1.name() ) ) )
-      .andExpect( status().isOk() )
-      .andExpect( jsonPath( "$.code", is( code ) ) );
-
-    verify( service, times( 1 ) ).create( player1 );
   }
 }

@@ -1,4 +1,6 @@
-package demo.games;
+package demo.games.pvp;
+
+import demo.games.shared.Hand;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,13 +24,13 @@ public class PvpGameServiceTest {
     gameToSaved.setPlayer1( player1 );
     final GameResponse expected = new GameResponse( code );
 
-    final RandomService randomService = mock( RandomService.class );
+    final GameCodeService randomService = mock( GameCodeService.class );
     final GameRepository repository = mock( GameRepository.class );
 
     when( randomService.nextCode( eq( 8 ) ) ).thenReturn( code );
     when( repository.save( eq( gameToSaved ) ) ).thenReturn( gameToSaved );
 
-    final GameService service = new GameService( randomService, repository );
+    final PvpGameService service = new PvpGameService( randomService, repository );
 
     final GameResponse created = service.create( player1 );
     assertEquals( expected, created );

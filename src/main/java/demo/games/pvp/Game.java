@@ -1,5 +1,6 @@
-package demo.games;
+package demo.games.pvp;
 
+import demo.games.shared.Hand;
 import lombok.Data;
 
 import javax.persistence.Entity;
