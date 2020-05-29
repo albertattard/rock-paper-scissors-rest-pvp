@@ -3,6 +3,7 @@ package demo.games.pvp;
 import demo.games.shared.Hand;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -17,12 +18,14 @@ public class Game {
   @Id
   private String code;
 
-  @Enumerated( EnumType.STRING)
+  @Column( name = "player_1" )
+  @Enumerated( EnumType.STRING )
   private Hand player1;
 
-  @Enumerated( EnumType.STRING)
+  @Column( name = "player_2" )
+  @Enumerated( EnumType.STRING )
   private Hand player2;
 
-  @Enumerated( EnumType.STRING)
+  @Enumerated( EnumType.STRING )
   private GameState state;
 }

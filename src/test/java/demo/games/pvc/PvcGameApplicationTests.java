@@ -13,9 +13,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-@DisplayName( "Game application" )
+@DisplayName( "PvC Game application" )
 @SpringBootTest( webEnvironment = WebEnvironment.RANDOM_PORT )
-public class GameApplicationTests {
+public class PvcGameApplicationTests {
 
   @LocalServerPort
   private int port;
