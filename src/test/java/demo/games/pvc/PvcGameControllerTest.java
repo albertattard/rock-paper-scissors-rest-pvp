@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /* Just load the following controller and all it needs */
 @WebMvcTest( PvcGameController.class )
-@DisplayName( "Rock controller" )
+@DisplayName( "PvC Game controller" )
 public class PvcGameControllerTest {
 
   @Autowired

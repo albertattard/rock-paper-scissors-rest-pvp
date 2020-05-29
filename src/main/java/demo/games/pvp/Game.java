@@ -22,4 +22,7 @@ public class Game {
 
   @Enumerated( EnumType.STRING)
   private Hand player2;
+
+  @Enumerated( EnumType.STRING)
+  private GameState state;
 }

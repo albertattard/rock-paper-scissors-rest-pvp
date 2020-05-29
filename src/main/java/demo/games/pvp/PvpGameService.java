@@ -3,6 +3,9 @@ package demo.games.pvp;
 import demo.games.shared.Hand;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PvpGameService {
 
@@ -20,8 +23,16 @@ public class PvpGameService {
     final Game game = new Game();
     game.setCode( code );
     game.setPlayer1( player1 );
+    game.setState( GameState.OPEN );
     repository.save( game );
 
     return new GameResponse( code );
+  }
+
+  public List<GameResponse> listOpenGames() {
+    return repository.findByStateEquals( GameState.OPEN )
+      .stream()
+      .map( r -> new GameResponse( r.getCode() ) )
+      .collect( Collectors.toList() );
   }
 }
