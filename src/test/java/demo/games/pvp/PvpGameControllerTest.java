@@ -20,6 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,7 +44,7 @@ public class PvpGameControllerTest {
 
     when( service.create( player1 ) ).thenReturn( game );
 
-    mockMvc.perform( get( String.format( "/game/new/%s", player1.name() ) ) )
+    mockMvc.perform( post( String.format( "/game/new/%s", player1.name() ) ) )
       .andExpect( status().isOk() )
       .andExpect( jsonPath( "$.code", is( game.getCode() ) ) );
 

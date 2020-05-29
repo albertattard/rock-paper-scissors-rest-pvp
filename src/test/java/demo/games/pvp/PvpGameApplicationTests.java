@@ -1,7 +1,6 @@
 package demo.games.pvp;
 
 import demo.games.shared.Hand;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +9,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @DisplayName( "PvP Game application" )
@@ -29,13 +31,17 @@ public class PvpGameApplicationTests {
   public void shouldPlayAGameAgainstAnotherPlayer() {
     final Hand player1 = Hand.ROCK;
 
-    final GameResponse created = restTemplate.getForObject( newGamePath( player1 ), GameResponse.class );
+    final GameResponse created = restTemplate.postForObject( newGamePath( player1 ), Collections.emptyMap(), GameResponse.class );
+    assertNotNull( created );
+    assertNotNull( created.getCode() );
+
     final GameResponse[] open = restTemplate.getForObject( listOpenPath(), GameResponse[].class );
+    assertNotNull( open );
+    assertTrue( open.length > 0 );
 
     final Comparator<GameResponse> comparator = Comparator.comparing( GameResponse::getCode );
     Arrays.sort( open, comparator );
-
-    Assertions.assertTrue( Arrays.binarySearch( open, created, comparator ) >= 0 );
+    assertTrue( Arrays.binarySearch( open, created, comparator ) >= 0 );
   }
 
   private String newGamePath( final Hand player1 ) {
