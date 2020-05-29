@@ -17,7 +17,6 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /* Just load the following controller and all it needs */
@@ -52,8 +52,8 @@ public class PvpGameControllerTest {
         .contentType( APPLICATION_JSON )
         .content( createGameAsJson( player1 ) )
     )
-      .andExpect( status().isOk() )
-      .andExpect( jsonPath( "$.code", is( game.getCode() ) ) );
+      .andExpect( status().isCreated() )
+      .andExpect( redirectedUrl( String.format( "/game/%s", game.getCode() ) ) );
 
     verify( service, times( 1 ) ).create( player1 );
   }

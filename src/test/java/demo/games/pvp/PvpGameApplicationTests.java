@@ -7,15 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-@DisplayName( "PvP Game application" )
+@DisplayName( "PvP game application" )
 @SpringBootTest( webEnvironment = WebEnvironment.RANDOM_PORT )
 public class PvpGameApplicationTests {
 
@@ -30,9 +33,16 @@ public class PvpGameApplicationTests {
   public void shouldPlayAGameAgainstAnotherPlayer() {
     final Hand player1 = Hand.ROCK;
 
-    final GameResponse created = restTemplate.postForObject( newGamePath(), new CreateGame( player1 ), GameResponse.class );
+    final ResponseEntity<String> created = restTemplate.postForEntity( newGamePath(), new CreateGame( player1 ), String.class );
     assertNotNull( created );
-    assertNotNull( created.getCode() );
+    assertEquals( HttpStatus.CREATED, created.getStatusCode() );
+
+    final String location = created.getHeaders().getLocation().getRawPath();
+    assertNotNull( location );
+
+    /* TODO: We should not be parsing links.  Remove once we have the GET game details */
+    assertTrue( location.matches( "/game/[a-zA-Z0-9]{8}" ) );
+    final String code = location.substring( 6 );
 
     final GameResponse[] open = restTemplate.getForObject( listOpenPath(), GameResponse[].class );
     assertNotNull( open );
@@ -40,7 +50,7 @@ public class PvpGameApplicationTests {
 
     final Comparator<GameResponse> comparator = Comparator.comparing( GameResponse::getCode );
     Arrays.sort( open, comparator );
-    assertTrue( Arrays.binarySearch( open, created, comparator ) >= 0 );
+    assertTrue( Arrays.binarySearch( open, new GameResponse( code ), comparator ) >= 0 );
   }
 
   private String newGamePath() {
