@@ -1,5 +1,6 @@
 package demo.games;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -8,8 +9,12 @@ import java.util.Random;
 public class RandomService {
 
   public int nextInt( int bound ) {
-    return randomNumber.nextInt( bound );
+    return random.nextInt( bound );
   }
 
-  private final Random randomNumber = new Random();
+  public String nextCode( int length ) {
+    return RandomStringUtils.randomAlphanumeric( length );
+  }
+
+  private final Random random = new Random();
 }
