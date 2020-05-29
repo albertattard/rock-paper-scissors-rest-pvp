@@ -1,10 +1,13 @@
 package demo.games.pvp;
 
 import demo.games.shared.Hand;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,23 +23,18 @@ public class PvpGameServiceTest {
   @Test
   @DisplayName( "should create game and return the game code" )
   public void shouldCreateGameAndReturnCode() {
-    final String code = "abcdefgh";
-    final Hand player1 = Hand.ROCK;
-    final Game gameToSaved = new Game();
-    gameToSaved.setCode( code );
-    gameToSaved.setPlayer1( player1 );
-    gameToSaved.setState( GameState.OPEN );
+    final Game gameToSaved = createRandomGame();
 
     final GameCodeService codeService = mock( GameCodeService.class );
     final GameRepository repository = mock( GameRepository.class );
 
-    when( codeService.nextCode( eq( 8 ) ) ).thenReturn( code );
+    when( codeService.nextCode( eq( 8 ) ) ).thenReturn( gameToSaved.getCode() );
     when( repository.save( eq( gameToSaved ) ) ).thenReturn( gameToSaved );
 
     final PvpGameService service = new PvpGameService( codeService, repository );
 
-    final GameResponse created = service.create( player1 );
-    assertEquals( new GameResponse( code ), created );
+    final GameResponse created = service.create( gameToSaved.getPlayer1() );
+    assertEquals( toGameResponse( gameToSaved ), created );
 
     verify( codeService, times( 1 ) ).nextCode( 8 );
     verify( repository, times( 1 ) ).save( gameToSaved );
@@ -45,13 +43,7 @@ public class PvpGameServiceTest {
   @Test
   @DisplayName( "should return a list of open games" )
   public void shouldReturnOpenGames() {
-    final String code = "abcdefgh";
-    final Game gameInDb = new Game();
-    gameInDb.setCode( code );
-    gameInDb.setPlayer1( Hand.ROCK );
-    gameInDb.setState( GameState.OPEN );
-    final List<Game> gamesInDb = List.of( gameInDb );
-    final List<GameResponse> expected = List.of( new GameResponse( code ) );
+    final List<Game> gamesInDb = createRandomGames( 5 );
 
     final GameCodeService codeService = mock( GameCodeService.class );
     final GameRepository repository = mock( GameRepository.class );
@@ -61,8 +53,35 @@ public class PvpGameServiceTest {
     final PvpGameService service = new PvpGameService( codeService, repository );
 
     final List<GameResponse> games = service.listOpenGames();
-    assertEquals( expected, games );
+    assertEquals( toGameResponse( gamesInDb ), games );
 
     verifyNoInteractions( codeService );
+    verify( repository, times( 1 ) ).findByStateEquals( GameState.OPEN );
+  }
+
+  private List<Game> createRandomGames( int number ) {
+    final List<Game> games = new ArrayList<>( number );
+    for ( int i = 0; i < number; i++ ) {
+      games.add( createRandomGame() );
+    }
+    return games;
+  }
+
+  private Game createRandomGame() {
+    final Game game = new Game();
+    game.setCode( RandomStringUtils.randomAlphanumeric( 8 ) );
+    game.setPlayer1( Hand.ROCK );
+    game.setState( GameState.OPEN );
+    return game;
+  }
+
+  private List<GameResponse> toGameResponse( List<Game> games ) {
+    return games.stream()
+      .map( this::toGameResponse )
+      .collect( Collectors.toList() );
+  }
+
+  private GameResponse toGameResponse( Game game ) {
+    return new GameResponse( game.getCode() );
   }
 }
