@@ -18,8 +18,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@DisplayName( "Game service" )
-public class GameServiceTest {
+@DisplayName( "Game service basic and PVC" )
+public class BasicPvcGameServiceTest {
 
   private static final int NUMBER_OF_HANDS = Hand.values().length;
 

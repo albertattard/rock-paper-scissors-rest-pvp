@@ -46,12 +46,28 @@ public class GameControllerTest {
 
     when( service.play( result.getPlayer() ) ).thenReturn( result );
 
-    mockMvc.perform( get( "/play/" + result.getPlayer().name() ) )
+    mockMvc.perform( get( String.format( "/play/%s", result.getPlayer().name() ) ) )
       .andExpect( status().isOk() )
       .andExpect( jsonPath( "$.computer", is( result.getComputer().name() ) ) )
       .andExpect( jsonPath( "$.player", is( result.getPlayer().name() ) ) )
       .andExpect( jsonPath( "$.outcome", is( result.getOutcome().name() ) ) );
 
     verify( service, times( 1 ) ).play( result.getPlayer() );
+  }
+
+  @Test
+  @DisplayName( "should create the new game and return the code" )
+  public void shouldCreateGameAndReturnCode() throws Exception {
+
+    final Hand player1 = Hand.ROCK;
+    final String code = "abcdefgh";
+
+    when( service.create( player1 ) ).thenReturn( new GameResponse( code ) );
+
+    mockMvc.perform( get( String.format( "/game/new/%s", player1.name() ) ) )
+      .andExpect( status().isOk() )
+      .andExpect( jsonPath( "$.code", is( code ) ) );
+
+    verify( service, times( 1 ) ).create( player1 );
   }
 }

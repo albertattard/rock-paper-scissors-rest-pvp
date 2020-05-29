@@ -24,4 +24,9 @@ public class GameController {
   public @ResponseBody PlayResult play( final @PathVariable( "player" ) Hand player ) {
     return service.play( player );
   }
+
+  @GetMapping( "/game/new/{player1}" )
+  public @ResponseBody GameResponse create( final @PathVariable( "player1" ) Hand player1 ) {
+    return service.create( player1 );
+  }
 }

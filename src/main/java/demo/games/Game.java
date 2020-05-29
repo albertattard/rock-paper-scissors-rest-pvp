@@ -1,11 +1,14 @@
 package demo.games;
 
+import lombok.Data;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@Data
 @Entity
 @Table( name = "games" )
 public class Game {

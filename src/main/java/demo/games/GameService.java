@@ -29,4 +29,15 @@ public class GameService {
     final Hand[] candidates = Hand.values();
     return candidates[randomService.nextInt( candidates.length )];
   }
+
+  public GameResponse create( final Hand player1 ) {
+    final String code = randomService.nextCode( 8 );
+
+    final Game game = new Game();
+    game.setCode( code );
+    game.setPlayer1( player1 );
+    repository.save( game );
+
+    return new GameResponse( code );
+  }
 }
