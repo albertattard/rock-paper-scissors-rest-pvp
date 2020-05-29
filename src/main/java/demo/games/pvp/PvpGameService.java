@@ -4,6 +4,7 @@ import demo.games.shared.Hand;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +37,12 @@ public class PvpGameService {
       .collect( Collectors.toList() );
   }
 
-  public GameDetails findGame( String code ) {
-    return new GameDetails()
-      .setCode( code );
+  public Optional<GameDetails> findGame( String code ) {
+    return repository.findById( code )
+      .map( r ->
+        new GameDetails()
+          .setCode( r.getCode() )
+          .setState( r.getState() )
+      );
   }
 }

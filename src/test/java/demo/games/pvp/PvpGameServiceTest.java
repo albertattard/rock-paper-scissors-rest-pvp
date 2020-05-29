@@ -7,9 +7,15 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -57,6 +63,53 @@ public class PvpGameServiceTest {
 
     verifyNoInteractions( codeService );
     verify( repository, times( 1 ) ).findByStateEquals( GameState.OPEN );
+  }
+
+  @Test
+  @DisplayName( "should return Optional empty when game is not found" )
+  public void shouldReturnEmptyWhenNotFound() {
+
+    final String code = "12345678";
+
+    final GameCodeService codeService = mock( GameCodeService.class );
+    final GameRepository repository = mock( GameRepository.class );
+
+    when( repository.findById( eq( code ) ) ).thenReturn( Optional.empty() );
+
+    final PvpGameService service = new PvpGameService( codeService, repository );
+    final Optional<GameDetails> game = service.findGame( code );
+    assertNotNull( game );
+    assertTrue( game.isEmpty() );
+
+    verifyNoInteractions( codeService );
+    verify( repository, times( 1 ) ).findById( code );
+  }
+
+  @Test
+  @DisplayName( "should return limited details when game is still open" )
+  public void shouldReturnLimitedDetails() {
+
+    final Game gameInDb = createRandomGame();
+
+    final GameCodeService codeService = mock( GameCodeService.class );
+    final GameRepository repository = mock( GameRepository.class );
+
+    when( repository.findById( eq( gameInDb.getCode() ) ) ).thenReturn( Optional.of( gameInDb ) );
+
+    final PvpGameService service = new PvpGameService( codeService, repository );
+    final Optional<GameDetails> game = service.findGame( gameInDb.getCode() );
+    assertNotNull( game );
+    assertFalse( game.isEmpty() );
+
+    final GameDetails details = game.get();
+    assertEquals( gameInDb.getCode(), details.getCode() );
+    assertSame( GameState.OPEN, details.getState() );
+    assertNull( details.getPlayer1() );
+    assertNull( details.getPlayer2() );
+    assertNull( details.getOutcome() );
+
+    verifyNoInteractions( codeService );
+    verify( repository, times( 1 ) ).findById( gameInDb.getCode() );
   }
 
   private List<Game> createRandomGames( int number ) {
