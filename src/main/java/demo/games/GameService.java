@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
   private final RandomService randomService;
+  private final GameRepository repository;
 
-  public GameService( final RandomService randomService ) {
+  public GameService( final RandomService randomService, final GameRepository repository ) {
     this.randomService = randomService;
+    this.repository = repository;
   }
 
   public PlayResult play( final Hand player ) {

@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName( "Game service" )
@@ -28,12 +29,13 @@ public class GameServiceTest {
     final Hand expectedHand = Hand.ROCK;
 
     final RandomService randomService = mockRandomService( expectedHand );
+    final GameRepository repository = mockRepository();
 
-    final GameService service = new GameService( randomService );
+    final GameService service = new GameService( randomService, repository );
     final Hand hand = service.random();
     assertSame( expectedHand, hand );
 
-    verifyRandomService( randomService );
+    verifyMocks( randomService, repository );
   }
 
   @EnumSource( Hand.class )
@@ -56,13 +58,14 @@ public class GameServiceTest {
 
   private void playAndAssert( Hand computer, Hand player, Outcome outcome ) {
     final RandomService randomService = mockRandomService( computer );
+    final GameRepository repository = mockRepository();
 
-    final GameService service = new GameService( randomService );
+    final GameService service = new GameService( randomService, repository );
 
     final PlayResult result = new PlayResult( computer, player, outcome );
     assertEquals( result, service.play( player ) );
 
-    verifyRandomService( randomService );
+    verifyMocks( randomService, repository );
   }
 
   private RandomService mockRandomService( final Hand computer ) {
@@ -71,7 +74,12 @@ public class GameServiceTest {
     return randomService;
   }
 
-  private void verifyRandomService( final RandomService randomService ) {
+  private GameRepository mockRepository() {
+    return mock( GameRepository.class );
+  }
+
+  private void verifyMocks( final RandomService randomService, GameRepository repository ) {
     verify( randomService, times( 1 ) ).nextInt( NUMBER_OF_HANDS );
+    verifyNoInteractions( repository );
   }
 }
