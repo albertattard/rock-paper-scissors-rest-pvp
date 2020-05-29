@@ -22,7 +22,7 @@ public class PvpGameController {
     return service.create( player1 );
   }
 
-  @GetMapping( "/game/list/" )
+  @GetMapping( "/game/list" )
   public @ResponseBody List<GameResponse> list() {
     return service.listOpenGames();
   }
