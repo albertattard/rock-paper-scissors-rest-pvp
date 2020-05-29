@@ -18,7 +18,7 @@ public class PvcGameService {
     return new PlayResult( computer, player, outcome );
   }
 
-  private Outcome determineOutcome( Hand computer, final Hand player ) {
+  private Outcome determineOutcome( final Hand computer, final Hand player ) {
     return computer == player ? Outcome.DRAW :
       computer.beatenBy() == player ? Outcome.PLAYER_WIN :
         Outcome.COMPUTER_WIN;

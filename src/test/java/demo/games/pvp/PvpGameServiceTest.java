@@ -86,10 +86,11 @@ public class PvpGameServiceTest {
   }
 
   @Test
-  @DisplayName( "should return limited details when game is still open" )
+  @DisplayName( "should return limited game details when game is still open" )
   public void shouldReturnLimitedDetails() {
 
     final Game gameInDb = createRandomGame();
+    assertSame( GameState.OPEN, gameInDb.getState() );
 
     final GameCodeService codeService = mock( GameCodeService.class );
     final GameRepository repository = mock( GameRepository.class );
@@ -103,7 +104,7 @@ public class PvpGameServiceTest {
 
     final GameDetails details = game.get();
     assertEquals( gameInDb.getCode(), details.getCode() );
-    assertSame( GameState.OPEN, details.getState() );
+    assertSame( gameInDb.getState(), details.getState() );
     assertNull( details.getPlayer1() );
     assertNull( details.getPlayer2() );
     assertNull( details.getOutcome() );
@@ -112,7 +113,38 @@ public class PvpGameServiceTest {
     verify( repository, times( 1 ) ).findById( gameInDb.getCode() );
   }
 
-  private List<Game> createRandomGames( int number ) {
+  @Test
+  @DisplayName( "should return all game details when game is still open" )
+  public void shouldReturnAllDetails() {
+
+    final Game gameInDb = new Game()
+      .setCode( RandomStringUtils.randomAlphanumeric( 8 ) )
+      .setPlayer1( Hand.ROCK )
+      .setPlayer2( Hand.ROCK )
+      .setState( GameState.CLOSED );
+
+    final GameCodeService codeService = mock( GameCodeService.class );
+    final GameRepository repository = mock( GameRepository.class );
+
+    when( repository.findById( eq( gameInDb.getCode() ) ) ).thenReturn( Optional.of( gameInDb ) );
+
+    final PvpGameService service = new PvpGameService( codeService, repository );
+    final Optional<GameDetails> game = service.findGame( gameInDb.getCode() );
+    assertNotNull( game );
+    assertFalse( game.isEmpty() );
+
+    final GameDetails details = game.get();
+    assertEquals( gameInDb.getCode(), details.getCode() );
+    assertSame( gameInDb.getState(), details.getState() );
+    assertSame( gameInDb.getPlayer1(), details.getPlayer1() );
+    assertSame( gameInDb.getPlayer2(), details.getPlayer2() );
+    assertSame( Outcome.DRAW, details.getOutcome() );
+
+    verifyNoInteractions( codeService );
+    verify( repository, times( 1 ) ).findById( gameInDb.getCode() );
+  }
+
+  private List<Game> createRandomGames( final int number ) {
     final List<Game> games = new ArrayList<>( number );
     for ( int i = 0; i < number; i++ ) {
       games.add( createRandomGame() );
@@ -127,13 +159,13 @@ public class PvpGameServiceTest {
       .setState( GameState.OPEN );
   }
 
-  private List<GameResponse> toGameResponse( List<Game> games ) {
+  private List<GameResponse> toGameResponse( final List<Game> games ) {
     return games.stream()
       .map( this::toGameResponse )
       .collect( Collectors.toList() );
   }
 
-  private GameResponse toGameResponse( Game game ) {
+  private GameResponse toGameResponse( final Game game ) {
     return new GameResponse( game.getCode() );
   }
 }

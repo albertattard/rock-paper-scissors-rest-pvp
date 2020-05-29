@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static demo.games.pvp.GameState.CLOSED;
+import static demo.games.pvp.GameState.OPEN;
+
 @Service
 public class PvpGameService {
 
@@ -24,14 +27,14 @@ public class PvpGameService {
     final Game game = new Game()
       .setCode( code )
       .setPlayer1( player1 )
-      .setState( GameState.OPEN );
+      .setState( OPEN );
     repository.save( game );
 
     return new GameResponse( code );
   }
 
   public List<GameResponse> listOpenGames() {
-    return repository.findByStateEquals( GameState.OPEN )
+    return repository.findByStateEquals( OPEN )
       .stream()
       .map( r -> new GameResponse( r.getCode() ) )
       .collect( Collectors.toList() );
@@ -39,10 +42,29 @@ public class PvpGameService {
 
   public Optional<GameDetails> findGame( String code ) {
     return repository.findById( code )
-      .map( r ->
-        new GameDetails()
-          .setCode( r.getCode() )
-          .setState( r.getState() )
+      .map( r -> {
+          final GameDetails details = new GameDetails()
+            .setCode( r.getCode() )
+            .setState( r.getState() );
+
+          if ( shouldIncludeDetails( r.getState() ) ) {
+            details.setPlayer1( r.getPlayer1() )
+              .setPlayer2( r.getPlayer2() )
+              .setOutcome( determineOutcome( r.getPlayer1(), r.getPlayer2() ) );
+          }
+
+          return details;
+        }
       );
+  }
+
+  private boolean shouldIncludeDetails( GameState state ) {
+    return state == CLOSED;
+  }
+
+  private Outcome determineOutcome( final Hand player1, final Hand player2 ) {
+    return player1 == player2 ? Outcome.DRAW :
+      player1.beatenBy() == player2 ? Outcome.PLAYER_2_WIN :
+        Outcome.PLAYER_1_WIN;
   }
 }
