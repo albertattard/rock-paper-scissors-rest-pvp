@@ -68,11 +68,10 @@ public class PvpGameServiceTest {
   }
 
   private Game createRandomGame() {
-    final Game game = new Game();
-    game.setCode( RandomStringUtils.randomAlphanumeric( 8 ) );
-    game.setPlayer1( Hand.ROCK );
-    game.setState( GameState.OPEN );
-    return game;
+    return new Game()
+      .setCode( RandomStringUtils.randomAlphanumeric( 8 ) )
+      .setPlayer1( Hand.ROCK )
+      .setState( GameState.OPEN );
   }
 
   private List<GameResponse> toGameResponse( List<Game> games ) {

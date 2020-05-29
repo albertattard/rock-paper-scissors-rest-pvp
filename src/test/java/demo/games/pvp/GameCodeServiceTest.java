@@ -16,7 +16,7 @@ public class GameCodeServiceTest {
   @DisplayName( "should return a number of random codes without collisions" )
   public void shouldReturnARandomCode() {
 
-    final int testSize = 1_000_000;
+    final int testSize = 10_000;
     final int length = 8;
 
     final Set<String> observedCodes = new TreeSet<>( String.CASE_INSENSITIVE_ORDER );

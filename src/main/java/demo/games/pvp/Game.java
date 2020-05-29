@@ -2,6 +2,7 @@ package demo.games.pvp;
 
 import demo.games.shared.Hand;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table( name = "games" )
+@Accessors( chain = true )
 public class Game {
 
   @Id
