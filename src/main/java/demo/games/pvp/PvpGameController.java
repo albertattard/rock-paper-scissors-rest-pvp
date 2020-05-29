@@ -1,11 +1,9 @@
 package demo.games.pvp;
 
-import demo.games.shared.Hand;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -19,13 +17,15 @@ public class PvpGameController {
     this.service = service;
   }
 
-  @PostMapping( "/game/new/{player1}" )
-  public @ResponseBody GameResponse create( final @PathVariable( "player1" ) Hand player1 ) {
-    return service.create( player1 );
+  @ResponseBody
+  @PostMapping( "/game" )
+  public GameResponse create( @RequestBody CreateGame game ) {
+    return service.create( game.getPlayer1() );
   }
 
+  @ResponseBody
   @GetMapping( "/game/list" )
-  public @ResponseBody List<GameResponse> list() {
+  public List<GameResponse> list() {
     return service.listOpenGames();
   }
 }

@@ -9,7 +9,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,11 +26,11 @@ public class PvpGameApplicationTests {
   private TestRestTemplate restTemplate;
 
   @Test
-  @DisplayName( "should return a random hand" )
+  @DisplayName( "should play a game" )
   public void shouldPlayAGameAgainstAnotherPlayer() {
     final Hand player1 = Hand.ROCK;
 
-    final GameResponse created = restTemplate.postForObject( newGamePath( player1 ), Collections.emptyMap(), GameResponse.class );
+    final GameResponse created = restTemplate.postForObject( newGamePath(), new CreateGame( player1 ), GameResponse.class );
     assertNotNull( created );
     assertNotNull( created.getCode() );
 
@@ -44,8 +43,8 @@ public class PvpGameApplicationTests {
     assertTrue( Arrays.binarySearch( open, created, comparator ) >= 0 );
   }
 
-  private String newGamePath( final Hand player1 ) {
-    return String.format( "http://localhost:%d/game/new/%s", port, player1.name() );
+  private String newGamePath() {
+    return String.format( "http://localhost:%d/game", port );
   }
 
   private String listOpenPath() {

@@ -1,5 +1,7 @@
 package demo.games.pvp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import demo.games.shared.Hand;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /* Just load the following controller and all it needs */
 @WebMvcTest( PvpGameController.class )
-@DisplayName( "Rock controller" )
+@DisplayName( "PvP game controller" )
 public class PvpGameControllerTest {
 
   @Autowired
@@ -44,7 +47,11 @@ public class PvpGameControllerTest {
 
     when( service.create( player1 ) ).thenReturn( game );
 
-    mockMvc.perform( post( String.format( "/game/new/%s", player1.name() ) ) )
+    mockMvc.perform(
+      post( "/game" )
+        .contentType( APPLICATION_JSON )
+        .content( createGameAsJson( player1 ) )
+    )
       .andExpect( status().isOk() )
       .andExpect( jsonPath( "$.code", is( game.getCode() ) ) );
 
@@ -66,6 +73,17 @@ public class PvpGameControllerTest {
       .andExpect( jsonPath( "$[*].code", containsInAnyOrder( toGameCode( games ) ) ) );
 
     verify( service, times( 1 ) ).listOpenGames();
+  }
+
+  private String toJson( CreateGame game ) throws JsonProcessingException {
+    return new ObjectMapper()
+      .writer()
+      .withDefaultPrettyPrinter()
+      .writeValueAsString( game );
+  }
+
+  private String createGameAsJson( Hand player1 ) throws JsonProcessingException {
+    return toJson( new CreateGame( player1 ) );
   }
 
   private String[] toGameCode( List<GameResponse> games ) {
