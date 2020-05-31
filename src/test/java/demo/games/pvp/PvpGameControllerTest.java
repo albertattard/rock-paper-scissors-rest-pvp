@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,7 +46,7 @@ public class PvpGameControllerTest {
     final Hand player1 = Hand.ROCK;
     final GameResponse game = createRandomGame();
 
-    when( service.create( player1 ) ).thenReturn( game );
+    when( service.create( eq( player1 ) ) ).thenReturn( game );
 
     mockMvc.perform(
       post( "/game" )
@@ -66,13 +67,26 @@ public class PvpGameControllerTest {
 
     when( service.listOpenGames() ).thenReturn( games );
 
-    final ResultActions result = mockMvc.perform( get( "/game/list/" ) )
+    mockMvc.perform( get( "/game/list/" ) )
       .andExpect( status().isOk() )
       .andExpect( jsonPath( "$" ).isArray() )
       .andExpect( jsonPath( "$", hasSize( games.size() ) ) )
       .andExpect( jsonPath( "$[*].code", containsInAnyOrder( toGameCode( games ) ) ) );
 
     verify( service, times( 1 ) ).listOpenGames();
+  }
+
+  @Test
+  @DisplayName( "should return 404 when game is not found" )
+  public void shouldReturnNotFoundGameDetails() throws Exception {
+    final String code = "00000000";
+
+    when( service.findGame( eq( code ) ) ).thenReturn( Optional.empty() );
+
+    mockMvc.perform( get( String.format( "/game/%s", code ) ) )
+      .andExpect( status().isNotFound() );
+
+    verify( service, times( 1 ) ).findGame( code );
   }
 
   private String toJson( CreateGame game ) throws JsonProcessingException {

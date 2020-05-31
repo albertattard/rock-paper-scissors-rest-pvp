@@ -1,7 +1,9 @@
 package demo.games.pvp;
 
 import demo.games.shared.Hand;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
@@ -31,3 +33,5 @@ public class Game {
   @Enumerated( EnumType.STRING )
   private GameState state;
 }
+
+

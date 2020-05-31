@@ -3,6 +3,7 @@ package demo.games.pvp;
 import demo.games.shared.Hand;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class PvpGameService {
       .collect( Collectors.toList() );
   }
 
-  public Optional<GameDetails> findGame( String code ) {
+  public Optional<GameDetails> findGame( final String code ) {
     return repository.findById( code )
       .map( r -> {
           final GameDetails details = new GameDetails()
@@ -58,7 +59,20 @@ public class PvpGameService {
       );
   }
 
-  private boolean shouldIncludeDetails( GameState state ) {
+  @Transactional
+  public Optional<GameDetails> play( final String code, final Hand player2 ) {
+    return repository.findByCodeAndStateEquals( code, OPEN )
+      .map( game -> repository.save( game.setPlayer2( player2 ).setState( CLOSED ) ) )
+      .map( game -> new GameDetails()
+        .setCode( game.getCode() )
+        .setState( game.getState() )
+        .setPlayer1( game.getPlayer1() )
+        .setPlayer2( game.getPlayer2() )
+        .setOutcome( determineOutcome( game.getPlayer1(), game.getPlayer2() ) )
+      );
+  }
+
+  private boolean shouldIncludeDetails( final GameState state ) {
     return state == CLOSED;
   }
 
